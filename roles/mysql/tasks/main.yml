@@ -9,13 +9,6 @@
         login_unix_socket: /var/run/mysqld/mysqld.sock
   tags: [ mysql, mysql-root ]
 
-- name: alter root user authentication to native_password plugin
-  community.mysql.mysql_query:
-        login_user: root
-        login_password: "{{mysql_root_password}}"
-        query: alter user 'root'@'localhost' identified with mysql_native_password by '{{mysql_root_password}}'
-#If above task throws erros, run this command in your host machine where ansible is running
-# ansible-galaxy collection install community.mysql 
 - name: Remove all anonymous user accounts
   mysql_user:
         name: ''
@@ -33,25 +26,14 @@
         login_password: "{{ mysql_root_password }}"
   tags: [ mysql ]
 
-- name: create a database
-  community.mysql.mysql_db:
-    name: "{{wp_mysql_db}}"
-    state: present
-    login_user: root
-    login_password: "{{ mysql_root_password }}"
-    login_unix_socket: /run/mysqld/mysqld.sock  
+- name: Create mysql database
+  mysql_db: name={{ wp_mysql_db }} state=present
+  become: yes
 
-- name: creating a new user
-  ansible.builtin.mysql_user:
-    login_user: root
-    login_password: "{{mysql_root_password}}"
-    user: "{{wp_mysql_user}}"
-    password: "{{wp_mysql_password}}"
-    priv: '{{wp_mysql_db}}.*:ALL'
-    host: 'localhost'
+- name: Create mysql user
+  mysql_user:
+   name={{ wp_mysql_user }}
+   password={{ wp_mysql_password }}
+   priv=*.*:ALL
 
-- name: alter authentication to native_password plugin
-  community.mysql.mysql_query:
-    login_user: root
-    login_password: "{{mysql_root_password}}"
-    query: " alter user '{{wp_mysql_user}}'@'localhost' identified with mysql_native_password by '{{wp_mysql_password}}' "
+  become: yes
