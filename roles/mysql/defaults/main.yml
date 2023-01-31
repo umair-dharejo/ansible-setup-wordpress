@@ -1,6 +1,6 @@
 ---
 # defaults file for mysql
-mysql_root_password: Password786##
+mysql_root_password: <>
 wp_mysql_db: wordpress
 wp_mysql_user: worduser
-wp_mysql_password: Password786##
+wp_mysql_password: <>
